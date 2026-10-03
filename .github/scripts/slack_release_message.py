@@ -65,10 +65,22 @@ def blocks_to_mrkdwn(text: str) -> str:
 
     Runs on raw markdown, before `inline()` — splitting cells on `|` is only
     safe while links are still `[text](url)` and not yet `<url|text>`.
+
+    Inside a fenced block the leading `-`/`+`/`|` are the content, not markup:
+    a ```diff showing `- old()` / `+ new()` exists to show that distinction, so
+    fenced lines pass through untouched.
     """
     out: list[str] = []
+    in_fence = False
     for line in text.splitlines():
         stripped = line.strip()
+        if stripped.startswith("```") or stripped.startswith("~~~"):
+            in_fence = not in_fence
+            out.append(line)
+            continue
+        if in_fence:
+            out.append(line)
+            continue
         if stripped.startswith("|") and stripped.count("|") >= 2:
             if re.fullmatch(r"[\s:|-]*-[\s:|-]*", stripped.strip("|")):
                 continue  # table separator row
@@ -91,11 +103,21 @@ def strip_boilerplate(body: str) -> str:
 
 
 def split_sections(body: str) -> tuple[str, list[str]]:
-    """Return (intro, [heading, ...]) — text before the first heading, then headings."""
+    """Return (intro, [heading, ...]) — text before the first heading, then headings.
+
+    Fence-aware: a shell snippet's `# install the package` is a comment, not a
+    heading. Treating it as one would strand the fence opener and truncate the
+    summary at that line — exactly the shape RELEASE_TEMPLATE.md teaches.
+    """
     intro: list[str] = []
     headings: list[str] = []
+    in_fence = False
     for line in body.splitlines():
-        m = re.match(r"^#{1,6}\s+(.*\S)\s*$", line)
+        if line.strip().startswith(("```", "~~~")):
+            in_fence = not in_fence
+        # A fence line itself can never match the heading regex, so toggling
+        # first and skipping while inside is enough.
+        m = None if in_fence else re.match(r"^#{1,6}\s+(.*\S)\s*$", line)
         if m:
             headings.append(m.group(1))
         elif not headings:
@@ -112,7 +134,9 @@ def clip(text: str, budget: int) -> str:
         cut = window.rfind(boundary)
         if cut > budget // 2:
             return window[:cut].rstrip(" .\n") + "…"
-    return window.rstrip() + "…"
+    # No boundary to cut at: the ellipsis still has to fit inside the budget,
+    # or the header lands at 151 chars and Slack rejects the whole payload.
+    return window[: budget - 1].rstrip() + "…"
 
 
 def build(repo: str, tag: str, name: str, url: str, body: str, pkg: str = "") -> dict:

@@ -12,7 +12,7 @@ import json
 import pathlib
 import sys
 
-from slack_release_message import HEADER_LIMIT, SECTION_LIMIT, build, inline
+from slack_release_message import HEADER_LIMIT, SECTION_LIMIT, build, clip, inline
 
 REPO = "xanots/vector"
 URL = "https://github.com/xanots/vector/releases/tag/v9.9.9"
@@ -79,6 +79,36 @@ def test_cells_are_escaped_exactly_once() -> None:
     intro = sections(build(REPO, "v9.9.9", "n", URL, "| a & b | **c** |\n|---|---|"))[0]
     assert "a &amp; b" in intro and "&amp;amp;" not in intro
     assert "*c*" in intro and "**c**" not in intro
+
+
+def test_fenced_diff_keeps_its_markers() -> None:
+    """A ```diff exists to show `-` vs `+`; bulleting both destroys the point."""
+    payload = build(REPO, "v9.9.9", "n", URL, "Intro.\n\n```diff\n- old()\n+ new()\n```")
+    intro = sections(payload)[0]
+    assert "- old()" in intro and "+ new()" in intro
+    assert "•  old()" not in intro and "•  new()" not in intro
+    check_well_formed(payload)
+
+
+def test_fenced_shell_comment_is_not_a_heading() -> None:
+    """RELEASE_TEMPLATE.md's install snippet: `#` inside a fence is a comment."""
+    body = "Intro.\n\n```bash\n# install the package\nnpm install @xano-sdk/vector@1.2.3\n```\n\n## A real fix\ndetail"
+    payload = build(REPO, "v9.9.9", "n", URL, body)
+    intro, highlights = sections(payload)
+    assert "# install the package" in intro, "the fence must not be cut at the comment"
+    assert "npm install @xano-sdk/vector@1.2.3" in intro
+    assert intro.count("```") == 2, "the fence opener must not be left dangling"
+    assert "install the package" not in highlights
+    assert "•  A real fix" in highlights
+    check_well_formed(payload)
+
+
+def test_clip_leaves_room_for_the_ellipsis() -> None:
+    """With no paragraph, sentence or word boundary to cut at, the budget still holds."""
+    assert len(clip("A" * 400, HEADER_LIMIT)) <= HEADER_LIMIT
+    assert len(clip("a" * (SECTION_LIMIT + 1), SECTION_LIMIT)) <= SECTION_LIMIT
+    # And through the real payload: a boundary-free title must not exceed the header.
+    check_well_formed(build(REPO, "v9.9.9", "T" * 400, URL, "b" * (SECTION_LIMIT + 50)))
 
 
 def test_long_intro_clipped_at_a_boundary() -> None:

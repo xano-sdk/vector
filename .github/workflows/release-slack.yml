@@ -9,17 +9,21 @@ on:
         description: Existing release tag to (re-)announce, e.g. v2.0.0
         required: true
 
+# Reading the release is all this needs; it writes nothing back to the repo.
+permissions:
+  contents: read
+
 jobs:
   notify:
     # `released` already excludes prereleases; the tag check also skips
-    # semver prerelease tags (2.1.0-beta.1) that were published as full
+    # semver prerelease tags (4.1.0-beta.1) that were published as full
     # releases. A manual dispatch is explicit intent, so it is never skipped.
     if: >-
       github.event_name == 'workflow_dispatch' ||
       (!github.event.release.prerelease && !contains(github.event.release.tag_name, '-'))
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Resolve the release
         id: rel
