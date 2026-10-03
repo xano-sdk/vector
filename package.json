@@ -1,0 +1,85 @@
+{
+  "name": "@xano-sdk/vector",
+  "version": "1.0.0",
+  "description": "Plug-and-play vector search & multimodal Gemini embedding pipeline (document/chunk tables, ingestion, chunking strategies, management APIs, and agent tool) as typed Xano SDK defs.",
+  "type": "module",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
+  "author": "Xano",
+  "keywords": [
+    "xano",
+    "xanosdk",
+    "xanoscript",
+    "vector",
+    "embeddings",
+    "gemini",
+    "rag",
+    "search",
+    "ai",
+    "agent",
+    "pgvector",
+    "backend",
+    "codegen"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xanots/vector.git"
+  },
+  "homepage": "https://github.com/xanots/vector#readme",
+  "bugs": {
+    "url": "https://github.com/xanots/vector/issues"
+  },
+  "sideEffects": false,
+  "xanosdk": {
+    "register": "registerVector",
+    "returns": "handle",
+    "options": {}
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "!dist/**/*.map",
+    "README.md",
+    "AGENTS.md",
+    "llms.txt"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "typecheck": "tsc --noEmit",
+    "test": "tsc --noEmit && vitest run",
+    "test:watch": "vitest",
+    "lint": "eslint .",
+    "fixture:regen": "tsx scripts/regen-golden.ts",
+    "prepublishOnly": "npm run build",
+    "release": "npm publish --access public",
+    "release:beta": "npm version prerelease --preid=beta -m \"chore(release): %s\" && npm publish --tag beta --access public"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "peerDependencies": {
+    "@xano/sdk": ">=1.0.0 <2.0.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.0.0",
+    "@types/node": "^20.0.0",
+    "@typescript-eslint/eslint-plugin": "^8.0.0",
+    "@typescript-eslint/parser": "^8.0.0",
+    "@xano/sdk": "1.0.0",
+    "eslint": "^9.0.0",
+    "tsup": "^8.0.0",
+    "tsx": "^4.23.1",
+    "typescript": "^5.5.0",
+    "vitest": "^2.0.0"
+  }
+}

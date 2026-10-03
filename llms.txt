@@ -1,0 +1,62 @@
+# @xano-sdk/vector
+
+> Vector embedding, multimodal document ingestion, chunking, and similarity search module for Xano SDK, using Google Gemini Embeddings 2 (768 dimensions) and pgvector. Every export is a typed Xano SDK def; nothing runs inside the package. Peer: `@xano/sdk` `>=1.0.0 <2.0.0`.
+
+## Install
+
+`xanosdk marketplace install @xano-sdk/vector` (installs and wires it into `xano/index.ts`), or `npm install @xano-sdk/vector @xano/sdk`.
+
+## Quickstart
+
+```ts
+import { workspace, workspaceConfig } from "@xano/sdk";
+import { registerVector } from "@xano-sdk/vector";
+
+const ws = workspace("my-app").registerWorkspace(
+  workspaceConfig({ name: "my-app", env: { GEMINI_API_KEY: "" } }),
+);
+
+export const vector = registerVector(ws, { defaultStrategy: "markdown" });
+
+export default vector.xano;
+```
+
+Put the key's value in `xano/.env` (`GEMINI_API_KEY=...`). Never pass `process.env.X` into `workspaceConfig({ env })`: it is baked into the bundle at export.
+
+## Exports
+
+- `registerVector(xano, opts?: VectorOptions): RegisteredVector` — builds every def and registers it on the workspace. Call once per workspace; a second call throws.
+- `createVector(opts?: VectorOptions): Vector` — builds the same defs without registering: `document`, `chunk`, `embedFn`, `chunkFn`, `ingestFn`, `searchFn`, `searchTool`, `group`, `documents`, `search`, `queries`, `options`.
+- Def factories: `documentTable`, `chunkTable`, `generateEmbeddingFn`, `chunkTextFn`, `ingestDocumentFn`, `searchVectorsFn`, `vectorSearchTool`, `vectorGroup`, `documentQueries`, `searchQueries`.
+- `resolveOptions`, `DEFAULT_NAMES`, `CHUNK_STRATEGIES` (`fixed`, `paragraph`, `sentence`, `markdown`, `custom`), `DOCUMENT_STATUSES`, `GEMINI_EMBEDDING_DIMENSIONS` (768), and `DEFAULT_*` constants.
+- Types for every endpoint's input and response (`SearchInput`, `SearchResponse`, `VectorEndpoints`, …).
+
+## Options (`VectorOptions`)
+
+- `apiKeyEnv` (`"GEMINI_API_KEY"`), `model` (`"gemini-embedding-2"`), `taskTypeDocument` (`"RETRIEVAL_DOCUMENT"`), `taskTypeQuery` (`"RETRIEVAL_QUERY"`).
+- `defaultStrategy` (`"paragraph"`), `defaultChunkSize` (500, 20–10000), `defaultChunkOverlap` (50, `< defaultChunkSize`).
+- `searchLimit` (10, 1–100), `searchThreshold` (0.0, 0–1), `citationFormat` (`"markdown" | "numeric" | "none"`, default `"markdown"`).
+- `authTable`, `authenticated` (defaults to `true` when `authTable` is set), `userIdType` (`"int" | "uuid"`, inferred from `authTable`).
+- `routePrefix` (`"vector"`), `canonical` (API group canonical; also replaces `routePrefix` and prefixes def names), `names` (per-def name overrides), `tags`.
+
+With `authenticated`, every endpoint requires sign-in and document endpoints only see the caller's documents. Search is not scoped per user: it spans all indexed chunks.
+
+## Endpoints
+
+Base: `/api:<canonical>/<routePrefix>`. Without `canonical`, Xano assigns the group canonical on deploy.
+
+- `POST /documents/create` — `{ title, content?, media_data?, mime_type?, metadata?, strategy?, chunk_size?, chunk_overlap? }` → `{ document, chunk_count, status }`.
+- `GET /documents` — `{ page?, per_page? }` → paged `{ items, curPage, perPage, itemsReceived, itemsTotal, pageTotal }`.
+- `GET /documents/{id}` — → `{ document, chunks }`.
+- `DELETE /documents/{id}/delete` — deletes the document and its chunks → `{ deleted, id }`.
+- `POST /documents/{id}/reindex` — `{ strategy?, chunk_size?, chunk_overlap? }` → `{ document_id, status, chunk_count }`.
+- `POST /search` — `{ query?, query_media_data?, query_mime_type?, query_embedding?, limit?, threshold? }` → `{ results, count }`.
+- `POST /embed` — `{ text?, media_data?, mime_type?, model? }` → `{ embedding, dimensions }`.
+
+## Agent tool
+
+`vector.searchTool` (name `vector_search`) goes in `agent({ tools: [vector.searchTool] })` or an `mcpServer`'s `tools`. Inputs: `query`, `media_data?`, `mime_type?`, `limit` (5). An `agent()` needs `llm: { type, model?, apiKey?, systemPrompt? }`; it has no top-level `instructions`.
+
+## Multimodal
+
+Model `gemini-embedding-2` at 768 dimensions (MRL). Text, Markdown, `image/png`, `image/jpeg`, `image/webp`, `audio/mp3`, `audio/wav`, `video/mp4`. `media_data` is base64.
