@@ -14,8 +14,8 @@ import sys
 
 from slack_release_message import HEADER_LIMIT, SECTION_LIMIT, build, clip, inline
 
-REPO = "xanots/vector"
-URL = "https://github.com/xanots/vector/releases/tag/v9.9.9"
+REPO = "xano-sdk/vector"
+URL = "https://github.com/xano-sdk/vector/releases/tag/v9.9.9"
 
 
 def sections(payload: dict) -> list[str]:
