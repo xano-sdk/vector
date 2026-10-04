@@ -3,7 +3,7 @@
 [![npm version](https://img.shields.io/npm/v/@xano-sdk/vector.svg)](https://www.npmjs.com/package/@xano-sdk/vector)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-A vector embedding, document ingestion, chunking, and semantic search module for [Xano SDK](https://github.com/xanots/sdk). It uses Google Gemini Embeddings 2 (`gemini-embedding-2`) at **768 dimensions**, stores vectors in PostgreSQL `pgvector` with a cosine index, and ships an AI agent search tool.
+A vector embedding, document ingestion, chunking, and semantic search module for [Xano SDK](https://github.com/xano-sdk/sdk). It uses Google Gemini Embeddings 2 (`gemini-embedding-2`) at **768 dimensions**, stores vectors in PostgreSQL `pgvector` with a cosine index, and ships an AI agent search tool.
 
 Everything it exports is a typed Xano SDK def. Nothing runs inside this package; your workspace compiles the defs at `export()`.
 

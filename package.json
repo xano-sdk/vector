@@ -25,11 +25,11 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/xanots/vector.git"
+    "url": "git+https://github.com/xano-sdk/vector.git"
   },
-  "homepage": "https://github.com/xanots/vector#readme",
+  "homepage": "https://github.com/xano-sdk/vector#readme",
   "bugs": {
-    "url": "https://github.com/xanots/vector/issues"
+    "url": "https://github.com/xano-sdk/vector/issues"
   },
   "sideEffects": false,
   "xanosdk": {
