@@ -1,6 +1,6 @@
 {
   "name": "@xano-sdk/vector",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Plug-and-play vector search & multimodal Gemini embedding pipeline (document/chunk tables, ingestion, chunking strategies, management APIs, and agent tool) as typed Xano SDK defs.",
   "type": "module",
   "license": "MIT",
