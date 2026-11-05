@@ -1,6 +1,6 @@
 # @xano-sdk/vector
 
-> Vector embedding, multimodal document ingestion, chunking, and similarity search module for Xano SDK, using Google Gemini Embeddings 2 (768 dimensions) and pgvector. Every export is a typed Xano SDK def; nothing runs inside the package. Peer: `@xano/sdk` `>=1.0.0 <2.0.0`.
+> Vector embedding, multimodal document ingestion, chunking, and similarity search module for Xano SDK, using Google Gemini Embeddings 2 (768 dimensions) and pgvector. Every export is a typed Xano SDK def; nothing runs inside the package. Peer: `@xano/sdk` `>=1.0.16 <2.0.0`.
 
 ## Install
 

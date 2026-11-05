@@ -25,6 +25,8 @@ export function vectorSearchTool(
 
   return tool({
     name: opts.names.searchTool,
+    // `description` is for people reading the workspace, and `instructions` is what the model sees.
+    diagnostics: { allow: ["tool.description-shadowed"] },
     description:
       "Search the indexed document and media knowledge base using semantic vector similarity with Gemini multimodal embeddings.",
     instructions:

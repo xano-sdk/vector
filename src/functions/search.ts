@@ -126,10 +126,18 @@ export function searchVectorsFn(
         paging: { per_page: inp("limit") },
         as: "hits",
       }),
+      // Hits arrive nearest first, so dropping weak ones after the limit returns what a filter in the
+      // query would. Cosine distance is 1 minus similarity.
+      setVar("max_distance", withFilters(c.int(1), [fl.sub(inp("threshold"))])),
+      s.array.filter({
+        expr: ref("hits.items"),
+        if: expr(ref("$this.distance"), "<=", ref("max_distance")),
+        as: "matches",
+      }),
     ],
     response: obj({
-      results: ref("hits.items"),
-      count: withFilters(ref("hits.items"), [fl.count()]),
+      results: ref("matches"),
+      count: withFilters(ref("matches"), [fl.count()]),
     }),
     responseShape: {} as {
       results: SearchHit[];

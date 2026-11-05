@@ -10,3 +10,4 @@ docs/
 __pycache__/
 .xano/
 e2e/
+.live/

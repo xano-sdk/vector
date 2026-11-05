@@ -17,6 +17,7 @@ npm run typecheck
 
 # Run test suite
 npm test
+npm run test:live   # deploy to a local Xano engine, then search stored vectors over HTTP. Set GEMINI_API_KEY to also ingest and search by text
 
 # Regenerate golden fixture (deliberate act only — see below)
 npm run fixture:regen
@@ -48,7 +49,7 @@ npm run lint
 - **pgvector Cosine Search:** The HNSW index on `vector_chunk` uses `vector_cosine_ops`, and search evaluates `vector_cos_distance` sorted `asc`.
 - **Module manifest:** `package.json` carries a `"xanosdk"` field (`register: "registerVector"`, `returns: "handle"`, `options: {}`) so `xanosdk marketplace install` / `xanosdk init --marketplace` wire the module into `xano/index.ts` and bind the returned handle. Keep `register` in sync with the export name, and keep `options: {}` only while every option stays optional.
 - **Search is not owner-scoped:** with `authenticated`, document endpoints filter by `user_id`, but `searchVectorsFn` (and so `/search` and the agent tool) searches every chunk. The docs say so; change both together.
-- **Peer Range:** `@xano/sdk` is a peer dependency (`>=1.0.0 <2.0.0`). Dev dependency is pinned exactly to `1.0.0`. The window is `>=<floor> <2.0.0`: the floor is the lowest SDK the module is tested against, the ceiling is the next major.
+- **Peer Range:** `@xano/sdk` is a peer dependency (`>=1.0.16 <2.0.0`). Dev dependency is pinned exactly to `1.0.19`. The window is `>=<floor> <2.0.0`: the floor is the lowest SDK the module is tested against, the ceiling is the next major.
 
 ## The Golden-Bundle Contract
 

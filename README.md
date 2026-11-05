@@ -37,7 +37,7 @@ Or manually:
 npm install @xano-sdk/vector @xano/sdk
 ```
 
-Requires `@xano/sdk` `>=1.0.0 <2.0.0`.
+Requires `@xano/sdk` `>=1.0.16 <2.0.0`.
 
 ---
 
@@ -80,7 +80,7 @@ Do not write `process.env.GEMINI_API_KEY` into `workspaceConfig`. It is read at 
 | `defaultChunkSize` | `number` | `500` | Target characters per chunk (integer, 20 to 10000). |
 | `defaultChunkOverlap` | `number` | `50` | Characters shared by consecutive chunks (integer, `>= 0` and `< defaultChunkSize`). |
 | `searchLimit` | `number` | `10` | Default top-k for search (integer, 1 to 100). |
-| `searchThreshold` | `number` | `0.0` | Default minimum cosine similarity (0.0 to 1.0). |
+| `searchThreshold` | `number` | `0.0` | Default minimum cosine similarity (0.0 to 1.0). Weaker hits are dropped, so a search can return fewer than `limit`. |
 | `citationFormat` | `"markdown" \| "numeric" \| "none"` | `"markdown"` | How the agent tool tells the model to cite sources. |
 | `authTable` | `TableDef \| string` | `undefined` | Auth table that owns documents. Required when `authenticated` is `true`. |
 | `authenticated` | `boolean` | `true` if `authTable` is set, else `false` | Require a signed-in user on every endpoint and scope documents to their owner. |

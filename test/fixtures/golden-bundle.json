@@ -4006,7 +4006,7 @@
             "filters": [],
             "name": "",
             "tag": "const:expr2",
-            "value": "{ results: $var.hits.items, count: $var.hits.items|count }",
+            "value": "{ results: $var.matches, count: $var.matches|count }",
             "_xsid": "",
             "disabled": false
           }
@@ -4306,6 +4306,87 @@
                   "tag": "input",
                   "filters": []
                 }
+              }
+            },
+            "runtime": null,
+            "disabled": false,
+            "description": "",
+            "settings_registry": null
+          },
+          {
+            "as": "max_distance",
+            "name": "mvp:set_var",
+            "_xsid": "",
+            "addon": [],
+            "input": [],
+            "mocks": {},
+            "output": {
+              "items": [],
+              "filters": [],
+              "customize": false
+            },
+            "context": {
+              "value": "1",
+              "tag": "const:int",
+              "filters": [
+                {
+                  "name": "sub",
+                  "disabled": false,
+                  "arg": [
+                    {
+                      "value": "threshold",
+                      "tag": "input",
+                      "filters": []
+                    }
+                  ]
+                }
+              ]
+            },
+            "runtime": null,
+            "disabled": false,
+            "description": "",
+            "settings_registry": null
+          },
+          {
+            "as": "matches",
+            "name": "mvp:array_filter",
+            "_xsid": "",
+            "addon": [],
+            "input": [],
+            "mocks": {},
+            "output": {
+              "items": [],
+              "filters": [],
+              "customize": false
+            },
+            "context": {
+              "array": {
+                "value": "hits.items",
+                "tag": "var"
+              },
+              "expr": {
+                "expression": [
+                  {
+                    "type": "statement",
+                    "or": false,
+                    "group": {
+                      "expression": []
+                    },
+                    "statement": {
+                      "op": "<=",
+                      "left": {
+                        "operand": "$this.distance",
+                        "tag": "var",
+                        "filters": []
+                      },
+                      "right": {
+                        "operand": "max_distance",
+                        "tag": "var",
+                        "filters": []
+                      }
+                    }
+                  }
+                ]
               }
             },
             "runtime": null,
@@ -7499,5 +7580,5 @@
     "service": [],
     "branch": []
   },
-  "sig": "hnHK-KgNDk7SouGc_oZs5uX6YCM."
+  "sig": "gPUAl7HS8_ph-D3-zsSqJhASFwI."
 }

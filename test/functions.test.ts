@@ -14,6 +14,14 @@ describe("functions", () => {
     expect(fn.run.some((s: any) => s.name === "mvp:api_request")).toBe(true);
   });
 
+  it("applies the similarity threshold to the search results", () => {
+    const fn = byName(section(exportWith({}), "function"), "vector/search_vectors");
+    const encoded = JSON.stringify(fn);
+    expect(encoded).toContain("max_distance");
+    expect(encoded).toContain("array_filter");
+    expect(encoded).toContain("matches");
+  });
+
   it("encodes chunk_text function", () => {
     const payload = exportWith({});
     const fn = byName(section(payload, "function"), "vector/chunk_text");
