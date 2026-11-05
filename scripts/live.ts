@@ -3,7 +3,7 @@
 // a throwaway project, so the CLI's engine pin and lock never touch this package's package.json. Exits non-zero on
 // a failure.
 import { execFileSync } from "node:child_process";
-import { mkdirSync, writeFileSync } from "node:fs";
+import { mkdirSync, rmSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 
 const root = resolve(import.meta.dirname, "..");
@@ -13,7 +13,15 @@ mkdirSync(dir, { recursive: true });
 writeFileSync(resolve(dir, "package.json"), JSON.stringify({ name: "live-fixture", private: true }) + "\n");
 const bin = resolve(root, "node_modules/.bin/xanosdk");
 const geminiKey = process.env.GEMINI_API_KEY;
-const out = execFileSync(bin, ["deploy", entry, "--no-lock", "--env-var", `GEMINI_API_KEY=${geminiKey ?? "not-used-by-this-check"}`, "--yes", "--json"], { cwd: dir, encoding: "utf8", stdio: ["ignore", "pipe", "inherit"] });
+// The key goes in a private file, not an argument, so a failed deploy cannot print it.
+const envFile = resolve(dir, "backend.env");
+writeFileSync(envFile, `GEMINI_API_KEY=${geminiKey ?? "not-used-by-this-check"}\n`, { mode: 0o600 });
+let out: string;
+try {
+  out = execFileSync(bin, ["deploy", entry, "--no-lock", "--backend-env-file", envFile, "--yes", "--json"], { cwd: dir, encoding: "utf8", stdio: ["ignore", "pipe", "inherit"] });
+} finally {
+  rmSync(envFile, { force: true });
+}
 const deployed = JSON.parse(out.slice(out.indexOf("{"))) as { url: string };
 const base = deployed.url.replace(/\/+$/, "");
 
