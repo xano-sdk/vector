@@ -4,6 +4,8 @@
 
 ## Install
 
+`@xano/sdk`: peer, range `>=1.0.16 <2.0.0`, built and tested against 1.0.19.
+
 `xanosdk marketplace install @xano-sdk/vector` (installs and wires it into `xano/index.ts`), or `npm install @xano-sdk/vector @xano/sdk`.
 
 ## Quickstart
@@ -35,7 +37,7 @@ Put the key's value in `xano/.env` (`GEMINI_API_KEY=...`). Never pass `process.e
 
 - `apiKeyEnv` (`"GEMINI_API_KEY"`), `model` (`"gemini-embedding-2"`), `taskTypeDocument` (`"RETRIEVAL_DOCUMENT"`), `taskTypeQuery` (`"RETRIEVAL_QUERY"`).
 - `defaultStrategy` (`"paragraph"`), `defaultChunkSize` (500, 20–10000), `defaultChunkOverlap` (50, `< defaultChunkSize`).
-- `searchLimit` (10, 1–100), `searchThreshold` (0.0, 0–1), `citationFormat` (`"markdown" | "numeric" | "none"`, default `"markdown"`).
+- `searchLimit` (10, 1–100), `searchThreshold` (0.0, 0–1; weaker hits are dropped, so a search can return fewer than `limit`), `citationFormat` (`"markdown" | "numeric" | "none"`, default `"markdown"`).
 - `authTable`, `authenticated` (defaults to `true` when `authTable` is set), `userIdType` (`"int" | "uuid"`, inferred from `authTable`).
 - `routePrefix` (`"vector"`), `canonical` (API group canonical; also replaces `routePrefix` and prefixes def names), `names` (per-def name overrides), `tags`.
 
@@ -50,7 +52,7 @@ Base: `/api:<canonical>/<routePrefix>`. Without `canonical`, Xano assigns the gr
 - `GET /documents/{id}` — → `{ document, chunks }`.
 - `DELETE /documents/{id}/delete` — deletes the document and its chunks → `{ deleted, id }`.
 - `POST /documents/{id}/reindex` — `{ strategy?, chunk_size?, chunk_overlap? }` → `{ document_id, status, chunk_count }`.
-- `POST /search` — `{ query?, query_media_data?, query_mime_type?, query_embedding?, limit?, threshold? }` → `{ results, count }`.
+- `POST /search` — `{ query?, query_media_data?, query_mime_type?, query_embedding?, limit?, threshold? }` → `{ results, count }`. `threshold` is a minimum cosine similarity: hits below it are dropped, so `results` can hold fewer than `limit`.
 - `POST /embed` — `{ text?, media_data?, mime_type?, model? }` → `{ embedding, dimensions }`.
 
 ## Agent tool

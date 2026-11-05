@@ -37,7 +37,7 @@ Or manually:
 npm install @xano-sdk/vector @xano/sdk
 ```
 
-Requires `@xano/sdk` `>=1.0.16 <2.0.0`.
+Requires `@xano/sdk` `>=1.0.16 <2.0.0`. Built and tested against **1.0.19**.
 
 ---
 
